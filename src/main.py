@@ -2,7 +2,7 @@ import os
 
 from copystatic import copystatic
 
-from generate_page import generate_page
+from generate_page import generate_pages_recursive
 
 
 def getroot():
@@ -11,13 +11,15 @@ def getroot():
 
 
 def main():
+    # copu from static to public
     copystatic()
 
+    # from markdown to html
     root = getroot()
-    from_path = os.path.join(root, "content", "index.md")
+    dir_path_content = os.path.join(root, "content")
     template_path = os.path.join(root, "template.html")
-
-    generate_page()
+    dest_dir_path = os.path.join(root, "public")
+    generate_pages_recursive(dir_path_content, template_path, dest_dir_path)
 
 
 main()

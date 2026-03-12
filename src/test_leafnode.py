@@ -12,7 +12,7 @@ class TestLeafNode(unittest.TestCase):
         self.assertIsNone(node.props)
 
     def test_tohtml_novalue(self):
-        node = LeafNode("p", "")
+        node = LeafNode("p", None)
         with self.assertRaises(ValueError):
             node.to_html()
 
@@ -36,7 +36,7 @@ class TestLeafNode(unittest.TestCase):
         node = LeafNode("p", "whaare u ding hiere", props=props)
         output = node.props_to_html()
         self.assertEqual(
-            'href="https://www.google.com" target="_blank"'.strip(), output.strip()
+            ' href="https://www.google.com" target="_blank"'.strip(), output.strip()
         )
 
     def test_props_to_html_empty(self):

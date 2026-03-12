@@ -25,9 +25,6 @@ def copystatic():
 
 
 def copy_recursion(static_path, public_path, static_files):
-    if len(static_files) == 0:
-        raise Exception("No files to copy")
-
     for file in static_files:
         file_path = os.path.join(static_path, file)
         print(f" * {file_path} -> {public_path}")

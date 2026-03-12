@@ -61,7 +61,7 @@ def extract_markdown_images(text):
 
 
 def extract_markdown_links(text):
-    return re.findall(r"\[(.*?)\]\((.*?)\)", text)
+    return re.findall(r"(?<!!)\[(.*?)\]\((.*?)\)", text)
 
 
 def split_nodes_image(old_nodes):
@@ -74,7 +74,7 @@ def split_nodes_image(old_nodes):
     if current.text_type != TextType.TEXT:
         return [current] + split_nodes_image(old_nodes[1:])
 
-    parts = re.split(r"(!\[.*?\))", current.text)
+    parts = re.split(r"(!\[.*?\]\(.*?\))", current.text)
     if len(parts) % 2 == 0:
         raise ValueError("Invalid markdown, formatted section not closed")
 
@@ -104,7 +104,7 @@ def split_nodes_link(old_nodes):
     if current.text_type != TextType.TEXT:
         return [current] + split_nodes_link(old_nodes[1:])
 
-    parts = re.split(r"(\[.*?\))", current.text)
+    parts = re.split(r"((?<!!)\[.*?\]\(.*?\))", current.text)
     if len(parts) % 2 == 0:
         raise ValueError("Invalid markdown, formatted section not closed")
 
@@ -147,7 +147,7 @@ def text_node_to_html_node(text_node):
         case TextType.LINK:
             return LeafNode("a", text_node.text, {"href": text_node.url})
         case TextType.IMAGE:
-            return LeafNode("img", None, {"src": text_node.url, "alt": text_node.text})
+            return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
         case TextType.TEXT:
             return LeafNode(None, text_node.text)
         case _:
@@ -203,11 +203,8 @@ def block_to_block_type(block):
 
 def block_to_html_nodes(block, node_type):
     text_nodes = text_to_textnodes(block)
-    if len(text_nodes) == 1:
-        return LeafNode(node_type, block)
-    else:
-        html_nodes = [text_node_to_html_node(text_node) for text_node in text_nodes]
-        return ParentNode(node_type, html_nodes)
+    html_nodes = [text_node_to_html_node(text_node) for text_node in text_nodes]
+    return ParentNode(node_type, html_nodes)
 
 
 def block_to_heading_nodes(block):
@@ -242,7 +239,7 @@ def block_to_quote_nodes(block):
     items = block.split("\n")
     processed_lines = []
     for item in items:
-        if not item.startswith("> "):
+        if not item.startswith(">"):
             raise ValueError("Invalid quote block")
         processed_lines.append(item.lstrip(">").strip())
 
@@ -254,7 +251,8 @@ def block_to_ulist_nodes(block):
     lis = []
     items = block.split("\n")
     for item in items:
-        lis.append(LeafNode("li", item.lstrip("- ")))
+        html_nodes = block_to_html_nodes(item.lstrip("- ").strip(), "li")
+        lis.append(html_nodes)
 
     return ParentNode("ul", lis)
 
@@ -264,7 +262,8 @@ def block_to_olist_nodes(block):
     items = block.split("\n")
     for item in items:
         cleaned_text = re.sub(r"^\d+\. ", "", item)
-        lis.append(LeafNode("li", cleaned_text))
+        html_nodes = block_to_html_nodes(cleaned_text, "li")
+        lis.append(html_nodes)
 
     return ParentNode("ol", lis)
 

@@ -24,7 +24,7 @@ class TestTextNode(unittest.TestCase):
         node = HTMLNode(props=props)
         output = node.props_to_html()
         self.assertEqual(
-            'href="https://www.google.com" target="_blank"'.strip(), output.strip()
+            ' href="https://www.google.com" target="_blank"'.strip(), output.strip()
         )
 
     def test_props_to_html_empty(self):
