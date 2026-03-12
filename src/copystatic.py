@@ -2,12 +2,12 @@ import os
 import shutil
 
 
-def copystatic():
+def copystatic(copy_path):
     src_dir = os.path.dirname(os.path.abspath(__file__))
     root_dir = os.path.dirname(src_dir)
 
     static_path = os.path.join(root_dir, "static")
-    public_path = os.path.join(root_dir, "public")
+    public_path = os.path.join(root_dir, copy_path)
 
     if not os.path.exists(public_path):
         os.mkdir(public_path)
